@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  redis:
+    image: redis
+    container_name: my-redis
+    ports:
+      - "6379:6379"
+  
+  api-server:
+    image: api-server
+    container_name: api-server
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+  exchange-app:
+    image: exchange-app
+    container_name: exchange-app
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api-server
