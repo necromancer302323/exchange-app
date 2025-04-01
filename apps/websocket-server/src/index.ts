@@ -17,13 +17,10 @@ const pubSub=createClient({
 pubSub.on('error', (err) => console.log('Redis Client Error', err));
 
 wss.on("connection",async()=>{
-    await pubSub.subscribe("order", (err, count) => {
-        if (err) {
-          console.error("Failed to subscribe:", err);
-        } else {
-          console.log(`Subscribed to ${count} channel(s).`);
-        }
-      })
+    await pubSub.subscribe("order", (message,count)=>{
+      console.log(message)
+    }
+      )
     pubSub.on("messasge",(message)=>{
         console.log(`recieved message ${message}`)
     })
