@@ -6,6 +6,11 @@ services:
     ports:
       - "6379:6379"
   
+  pub-sub:
+    image: redis
+    container_name: pub-sub
+    ports:
+      - "6380:6379"
   api-server:
     image: api-server
     container_name: api-server
@@ -20,3 +25,18 @@ services:
       - "5173:5173"
     depends_on:
       - api-server
+  engine:
+    image: engine
+    container_name: engine
+    ports:
+      - "3001:3001"
+    depends_on:
+      - redis
+      - pub-sub
+  
+  websocket-server:
+    image: websocket-server
+    container_name: websocket-server
+    ports:
+      - "8080:8080"
+  
