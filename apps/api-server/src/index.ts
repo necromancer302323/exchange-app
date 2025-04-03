@@ -1,16 +1,14 @@
 import express from "express";
 import { createClient } from "redis";
 import cors from "cors"
-
+import { PrismaClient } from "@repo/db";
 const app = express();
 app.use(express.json());
 app.use(cors())
-
 const client = createClient({
     url: "redis://my-redis:6379",
   });
-  
-  
+const prisma =new PrismaClient()
 client.on('error', (err) => console.log('Redis Client Error', err));
 
 app.post("/api/v1/order", async (req, res) => {
@@ -25,6 +23,37 @@ app.post("/api/v1/order", async (req, res) => {
         res.status(500).send("Failed to store submission.");
     }
 });
+
+app.post("/signup",async(req,res)=>{
+    const request=req.body
+    try{
+    await prisma.user.create({
+        data:request
+    })
+    res.send("succesfullt signed up")
+}catch(err){
+    console.log(err)
+    res.send("an error has occured please try again")
+}
+})
+
+
+app.post("/signin",async (req,res)=>{
+    const request=req.body
+    try{
+       const user= await prisma.user.findFirst({
+            where:{
+                email:request.email,
+                password:request.password
+            }
+        })
+        res.send("succesfullt signed in"+user)
+    }catch(err){
+        console.log(err)
+        res.send("an error has occured please try again")
+    }
+})
+
 
 async function startServer() {
     try {

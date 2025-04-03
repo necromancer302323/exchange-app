@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -b"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
     "@types/express": "^5.0.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "redis": "^4.7.0"
+    "redis": "^4.7.0",
+    "@repo/db":"*"
   }
 }

@@ -11,6 +11,13 @@ services:
     container_name: pub-sub
     ports:
       - "6380:6379"
+  database:
+    image: postgres
+    container_name: database
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
   api-server:
     image: api-server
     container_name: api-server
