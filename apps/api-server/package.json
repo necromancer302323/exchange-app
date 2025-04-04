@@ -11,12 +11,14 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@repo/common": "*",
+    "@repo/db": "*",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "redis": "^4.7.0",
-    "@repo/db":"*",
-    "@repo/common":"*"
+    "jsonwebtoken": "^9.0.2",
+    "redis": "^4.7.0"
   }
 }

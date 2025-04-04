@@ -14,7 +14,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
         `http://localhost:3000/${type == "signup" ? "signup" : "signin"}`,
         postInput
       );
-      const jwt: any = res.data;
+      const jwt:any = res.data;
       localStorage.setItem("token", jwt);
       console.log(jwt)
     } catch (e) {
