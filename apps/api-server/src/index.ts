@@ -41,13 +41,13 @@ app.post("/signup",async(req,res)=>{
 app.post("/signin",async (req,res)=>{
     const request=req.body
     try{
-       const user= await prisma.user.findFirst({
+       const user= await prisma.user.findUnique({
             where:{
                 email:request.email,
                 password:request.password
             }
         })
-        res.send("succesfullt signed in"+user)
+
     }catch(err){
         console.log(err)
         res.send("an error has occured please try again")

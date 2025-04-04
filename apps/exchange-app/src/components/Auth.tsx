@@ -1,9 +1,10 @@
 import axios from "axios";
 import { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {SignupInput} from "@repo/common"
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
-  const [postInput, setPostInputs] = useState<any>({
+  const [postInput, setPostInputs] = useState<SignupInput>({
     email: "",
     password: "",
   });
@@ -13,7 +14,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
         `http://localhost:3000/${type == "signup" ? "signup" : "signin"}`,
         postInput
       );
-      const jwt:any = res.data;
+      const jwt: any = res.data;
       localStorage.setItem("token", jwt);
       console.log(jwt)
     } catch (e) {
@@ -41,19 +42,6 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
             </div>
           </div>
 
-          {type == "signup" ? (
-            <LabbledInput
-              Label="Name"
-              Placeholder="aaryan"
-              type=""
-              onChange={(e) => {
-                setPostInputs({
-                  ...postInput,
-                  name: e.target.value,
-                });
-              }}
-            />
-          ) : null}
           <LabbledInput
             Label="Email"
             Placeholder="example@gmail.com"
