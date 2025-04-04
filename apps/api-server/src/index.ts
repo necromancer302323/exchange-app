@@ -2,6 +2,7 @@ import express from "express";
 import { createClient } from "redis";
 import cors from "cors"
 import { PrismaClient } from "@repo/db";
+import jwt from "jsonwebtoken"
 const app = express();
 app.use(express.json());
 app.use(cors())
@@ -47,7 +48,8 @@ app.post("/signin",async (req,res)=>{
                 password:request.password
             }
         })
-
+        const token =  jwt.sign(JSON.stringify(user),"1122333")
+        res.send(token)
     }catch(err){
         console.log(err)
         res.send("an error has occured please try again")
