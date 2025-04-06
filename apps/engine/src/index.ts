@@ -18,15 +18,20 @@ async function startServer() {
         await client.connect();
         await pubSub.connect()
         console.log("Connected to Redis");
-        const a=await client.brPop("order",0)
-        console.log({a})
-        if(a){
-            setInterval(async ()=>{
-                await pubSub.publish("order",JSON.stringify(a))
-            },1000)
-            
+        while (true){
+        const response=await client.brPop("order",0)
+        if(!response){
+
+        }else{
+            console.log(response)
+            if(response){
+                setTimeout(async ()=>{
+                    await pubSub.publish("order",JSON.stringify(response))
+                },1000)
+                
+            }
         }
-        
+        }
     } catch (error) {
         console.error("Failed to connect to Redis", error);
     }

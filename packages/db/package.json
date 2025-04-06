@@ -5,7 +5,8 @@
     "@prisma/client": "^5.11.0"
   },
   "scripts": {
-    "generate": "prisma generate"
+    "generate": "prisma generate",
+    "build":"tsc -b"
   },
   "devDependencies": {
     "prisma": "5.11.0"

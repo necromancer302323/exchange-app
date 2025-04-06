@@ -10,6 +10,7 @@ app.use(cors())
 const client = createClient({
     url: "redis://my-redis:6379",
 });
+
 const prisma = new PrismaClient()
 client.on('error', (err) => console.log('Redis Client Error', err));
 
