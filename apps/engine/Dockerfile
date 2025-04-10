@@ -1,7 +1,6 @@
 FROM node:20
 
-WORKDIR /src
-
+WORKDIR /
 COPY . .
 
 RUN npm i

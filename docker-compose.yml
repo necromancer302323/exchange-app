@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   redis:
     image: redis
@@ -11,6 +10,12 @@ services:
     container_name: pub-sub
     ports:
       - "6380:6379"
+
+  api-engine-pubsub:
+    image: redis
+    container_name: api-engine-pubsub
+    ports:
+      - "6381:6379"
   database:
     image: postgres
     container_name: database

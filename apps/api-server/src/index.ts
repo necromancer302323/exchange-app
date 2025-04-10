@@ -7,26 +7,48 @@ import { signinInput, signupInput } from "@repo/common";
 const app = express();
 app.use(express.json());
 app.use(cors())
-const client = createClient({
+
+const publisher = createClient({
     url: "redis://my-redis:6379",
 });
+const engine_pubsub = createClient({
+    url: "redis://api-engine-pubsub:6379",
+});
+
+function createRandomId() {
+    return Math.random().toString()
+}
+function sendAndAwait(message: any) {
+    return new Promise((resolve) => {
+        const id = createRandomId();
+        console.log(id)
+        engine_pubsub.subscribe(id, (message) => {
+            engine_pubsub.unsubscribe(id);
+            resolve(JSON.parse(message));
+        });
+        publisher.lPush("order", JSON.stringify({ clientId: id, message }));
+    });
+}
+
 
 const prisma = new PrismaClient()
-client.on('error', (err) => console.log('Redis Client Error', err));
 
 app.post("/api/v1/order", async (req, res) => {
     const request = req.body
     console.log(req.body)
     try {
-        await client.lPush("order", JSON.stringify(request))
-        // Store in the database
+        await publisher.lPush("order", JSON.stringify(request))
         res.status(200).send("Submission received and stored.");
     } catch (error) {
         console.error("Redis error:", error);
         res.status(500).send("Failed to store submission.");
     }
 });
-
+app.post("/api/v1/depth", async (req, res) => {
+    const response= await sendAndAwait({ type: "DEPTH",})
+    console.log(response)
+    res.send(response)
+})
 app.post("/signup", async (req, res) => {
     const request = req.body
     const { success } = signupInput.safeParse(request);
@@ -87,7 +109,8 @@ app.post("/signin", async (req, res) => {
 
 async function startServer() {
     try {
-        await client.connect();
+        await publisher.connect();
+        await engine_pubsub.connect()
         console.log("Connected to Redis");
 
         app.listen(3000, "0.0.0.0", () => {
