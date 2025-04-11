@@ -37,8 +37,17 @@ app.post("/api/v1/order", async (req, res) => {
     const request = req.body
     console.log(req.body)
     try {
-        await publisher.lPush("order", JSON.stringify(request))
-        res.status(200).send("Submission received and stored.");
+        if(request.type=="bid"){
+        const response= await sendAndAwait(request)
+        console.log(response)
+        res.send(response)
+        }else if(request.type == "ask"){
+            const response= await sendAndAwait(request)
+            console.log(response)
+            res.send(response)
+        }else{
+        res.status(200).send("err has occured");
+        }
     } catch (error) {
         console.error("Redis error:", error);
         res.status(500).send("Failed to store submission.");

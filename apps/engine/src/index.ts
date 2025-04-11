@@ -14,7 +14,33 @@ const engine_pubsub = createClient({
 });
 
   
+interface Order {
+    price: number;
+    quantity: number;
+    orderId: string;
+}
 
+interface Bid extends Order {
+    side: 'bid';
+}
+
+interface Ask extends Order {
+    side: 'ask';
+}
+
+interface Orderbook {
+    bids: Bid[];
+    asks: Ask[];
+}
+
+const orderbook: Orderbook = {
+  bids: [
+    
+  ],
+  asks: [
+    
+  ]
+}
 
 async function startServer() {
     try {
@@ -22,33 +48,59 @@ async function startServer() {
         await pubSub.connect()
         await engine_pubsub.connect()
         console.log("Connected to Redis");
+        setInterval(()=>{
+            console.log(orderbook)
+        },5000)
         while (true){
         const response=await client.brPop("order" ,0)
         if(!response){
             
         }else{
          const message = JSON.parse(response.element)
-            if(response){
-                if(message.clientId){
-               await engine_pubsub.publish(message.clientId,JSON.stringify({message:"a"}))
-                }else{
-              await pubSub.publish("order",JSON.stringify(response))
-                }
+          processingMessage(message.message,message.clientId)
+                
             }
-        }
         }
     } catch (error) {
         console.error("Failed to connect to Redis", error);
     }
 }
-function processingMessage({message,clientId}:{message:any,clientId: string}){
+function processingMessage(message:any,clientId: string){
+    console.log(message)
     switch (message.type){
         case "GET_DEPTH":
             try{
-                engine_pubsub.publish(clientId,"got depth")
+                engine_pubsub.publish(clientId,JSON.stringify(orderbook))
             }catch(e){
                 engine_pubsub.publish(clientId,"error")
             }
+        case "bid" :
+            try{
+                orderbook.bids.push({
+                    price:message.price,
+                    quantity:message.quantity,
+                    orderId:Math.random().toString(),
+                    side:"bid"
+                })
+                engine_pubsub.publish(clientId,JSON.stringify({message:"bid succesfull"}))
+                pubSub.publish("order",JSON.stringify(orderbook))
+            }catch(err){
+                console.log(err)   
+            }
+        case "ask":
+            try{
+                orderbook.asks.push({
+                    price:message.price,
+                    quantity:message.quantity,
+                    orderId:Math.random().toString(),
+                    side:"ask"
+                })
+                engine_pubsub.publish(clientId,JSON.stringify({message:"ask succesfull"}))
+                pubSub.publish("order",JSON.stringify(orderbook))
+            }catch(err){
+                console.log(err)   
+            }
+            
     }
 }
 startServer();
