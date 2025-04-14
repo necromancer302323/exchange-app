@@ -53,8 +53,8 @@ app.post("/api/v1/order", async (req, res) => {
         res.status(500).send("Failed to store submission.");
     }
 });
-app.post("/api/v1/depth", async (req, res) => {
-    const response= await sendAndAwait({ type: "DEPTH",})
+app.get("/api/v1/depth", async (req, res) => {
+    const response= await sendAndAwait({ type: "DEPTH"})
     console.log(response)
     res.send(response)
 })

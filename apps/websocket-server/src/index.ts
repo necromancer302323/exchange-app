@@ -16,14 +16,13 @@ const pubSub=createClient({
   
 pubSub.on('error', (err) => console.log('Redis Client Error', err));
 
-wss.on("connection",async()=>{
+wss.on("connection",async function(ws:WebSocket){
     await pubSub.subscribe("order", (message,count)=>{
       console.log(message)
+      ws.send(message)
     }
       )
-    pubSub.on("messasge",(message)=>{
-        console.log(`recieved message ${message}`)
-    })
+
 })
 
 async function startServer() {

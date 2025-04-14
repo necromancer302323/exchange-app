@@ -48,16 +48,14 @@ async function startServer() {
         await pubSub.connect()
         await engine_pubsub.connect()
         console.log("Connected to Redis");
-        setInterval(()=>{
-            console.log(orderbook)
-        },5000)
         while (true){
         const response=await client.brPop("order" ,0)
         if(!response){
             
         }else{
          const message = JSON.parse(response.element)
-          processingMessage(message.message,message.clientId)
+         console.log(message)
+          processingMessage(message.message,message.clientId,message.message.type)
                 
             }
         }
@@ -65,40 +63,44 @@ async function startServer() {
         console.error("Failed to connect to Redis", error);
     }
 }
-function processingMessage(message:any,clientId: string){
+function processingMessage(message:Ask|Bid,clientId: string,type:string){
     console.log(message)
-    switch (message.type){
-        case "GET_DEPTH":
+    if(type=="DEPTH"){
             try{
                 engine_pubsub.publish(clientId,JSON.stringify(orderbook))
             }catch(e){
                 engine_pubsub.publish(clientId,"error")
             }
-        case "bid" :
+        }
+        else if(type=="bid"){
             try{
+                const orderId=Math.random().toString()
                 orderbook.bids.push({
                     price:message.price,
                     quantity:message.quantity,
-                    orderId:Math.random().toString(),
+                    orderId:orderId,
                     side:"bid"
                 })
-                engine_pubsub.publish(clientId,JSON.stringify({message:"bid succesfull"}))
+                engine_pubsub.publish(clientId,JSON.stringify({message:"bid succesfull",orderId}))
                 pubSub.publish("order",JSON.stringify(orderbook))
             }catch(err){
-                console.log(err)   
+                console.log(err)
+                engine_pubsub.publish(clientId,JSON.stringify({message:"and error has occured order cancled"}))
             }
-        case "ask":
+        }else if(type=="ask"){
             try{
+                const orderId=Math.random().toString()
                 orderbook.asks.push({
                     price:message.price,
                     quantity:message.quantity,
-                    orderId:Math.random().toString(),
+                    orderId:orderId,
                     side:"ask"
                 })
-                engine_pubsub.publish(clientId,JSON.stringify({message:"ask succesfull"}))
+                engine_pubsub.publish(clientId,JSON.stringify({message:"ask succesfull",orderId}))
                 pubSub.publish("order",JSON.stringify(orderbook))
             }catch(err){
-                console.log(err)   
+                console.log(err)
+                engine_pubsub.publish(clientId,JSON.stringify({message:"and error has occured order cancled"}))
             }
             
     }
