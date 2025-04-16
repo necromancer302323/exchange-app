@@ -6,7 +6,6 @@ import { Homepage } from "./pages/HomePage";
 function App() {
 
   return (
-    <>
     <BrowserRouter>
     <Routes>
     <Route path="/signup" element={<Signup />} />
@@ -14,8 +13,6 @@ function App() {
     <Route path="/" element={<Homepage/>} />
     </Routes>
     </BrowserRouter>
-
-    </>
   )
 }
 
