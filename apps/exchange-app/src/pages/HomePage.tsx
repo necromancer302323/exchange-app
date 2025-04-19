@@ -1,12 +1,15 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useGetDepth } from "./utils";
+import { useSearchParams } from "react-router-dom";
 
 export const Homepage = () => {
   const [orderBook, setOrderBook] = useState<any>();
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
-  const data = useGetDepth();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const data = useGetDepth(searchParams.get("market") || "");
   const socket = new WebSocket("ws://localhost:8080");
   socket.onmessage = function (message) {
     console.log(message.data);
@@ -23,31 +26,33 @@ export const Homepage = () => {
           <div>
             <table className="w-full mt-20  bg-slate-800 rounded-md p-1.5 mr-14 ">
               <thead>
-              <tr className="text-white">
-                <th>Price</th>
-                <th>Quantity</th>
-              </tr>
+                <tr className="text-white">
+                  <th>Price</th>
+                  <th>Quantity</th>
+                </tr>
               </thead>
               <tbody>
-              {orderBook?.asks.slice(0, 5).map((value: any,index:any) => {
-                return (
-                  <tr key={index} className=" text-red-400 text-center ">
-                    <td>{value.price}</td>
-                    <td>{value.quantity}</td>
-                  </tr>
-                );
-              })}
-              <tr>
-                <td className="text-3xl text-green-400 text-center">248.26</td>
-              </tr>
-              {orderBook?.bids.slice(0, 5).map((value: any,index:any) => {
-                return (
-                  <tr key={index}className=" text-green-400 text-center">
-                    <td>{value.price}</td>
-                    <td>{value.quantity}</td>
-                  </tr>
-                );
-              })}
+                {orderBook?.asks.slice(0, 5).map((value: any, index: any) => {
+                  return (
+                    <tr key={index} className=" text-red-400 text-center ">
+                      <td>{value.price}</td>
+                      <td>{value.quantity}</td>
+                    </tr>
+                  );
+                })}
+                <tr>
+                  <td className="text-3xl text-green-400 text-center">
+                    248.26
+                  </td>
+                </tr>
+                {orderBook?.bids.slice(0, 5).map((value: any, index: any) => {
+                  return (
+                    <tr key={index} className=" text-green-400 text-center">
+                      <td>{value.price}</td>
+                      <td>{value.quantity}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -69,38 +74,37 @@ export const Homepage = () => {
               className="bg-slate-700 border border-slate-500 w-36 h-12 p-4 ml-3 rounded-md "
             ></input>
             <div className="grid grid-cols-2 gap-1">
-            <button
-              onClick={async () => {
-                const res:any = await axios.post(
-                  `http://localhost:3000/api/v1/order`,
-                  {
-                    price: Number(price),
-                    quantity: Number(quantity),
-                    type: "ask",
-                  }
-                );
-              }}
-              className="bg-slate-800 text-red-700  justify-center rounded-lg h-11"
-            >
-              Sell
-            </button>
-            <button
-              onClick={async () => {
-                const res:any = await axios.post(
-                  `http://localhost:3000/api/v1/order`,
-                  {
-                    price: Number(price),
-                    quantity: Number(quantity),
-                    type: "bid",
-                  }
-                );
-              }}
-              className="bg-slate-700 text-green-700 justify-center rounded-lg h-11"
-            >
-              buy
-            </button>
+              <button
+                onClick={async () => {
+                  await axios.post(
+                    `http://localhost:3000/api/v1/order?market=${searchParams.get("market")}`,
+                    {
+                      price: Number(price),
+                      quantity: Number(quantity),
+                      type: "ask",
+                    }
+                  );
+                }}
+                className="bg-slate-800 text-red-700  justify-center rounded-lg h-11"
+              >
+                Sell
+              </button>
+              <button
+                onClick={async () => {
+               await axios.post(
+                `http://localhost:3000/api/v1/order?market=${searchParams.get("market")}`,
+                    {
+                      price: Number(price),
+                      quantity: Number(quantity),
+                      type: "bid",
+                    }
+                  );
+                }}
+                className="bg-slate-700 text-green-700 justify-center rounded-lg h-11"
+              >
+                buy
+              </button>
             </div>
-            
           </div>
         </div>
       </div>

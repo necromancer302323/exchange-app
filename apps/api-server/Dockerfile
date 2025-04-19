@@ -1,24 +1,16 @@
-FROM node:20
+FROM node:latest
 
-WORKDIR /app
-
-COPY package.json ./    
-
-COPY packages ./packages
-
-COPY apps/api-server ./apps/api-server
-
-RUN npm install
-
-RUN npm run generate --workspace=@repo/db
-RUN npm run build --workspaces --if-present
-
-WORKDIR /app/apps/api-server
-RUN npm i typescript
-RUN npx tsc -b
-
-WORKDIR /app/apps/api-server
-
+WORKDIR /src
+COPY . .
+RUN  npm i
+RUN npx prisma generate --schema=packages/db/prisma/schema.prisma
+RUN npm run build \
+    --workspace=@repo/db \
+    --workspace=@repo/common \
+    --workspace=api-server \
+    --if-present
+    
+WORKDIR /src/apps/api-server
 EXPOSE 3000
 
 CMD [ "node","dist/index.js" ]

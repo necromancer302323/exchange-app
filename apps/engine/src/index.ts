@@ -29,18 +29,32 @@ interface Ask extends Order {
 }
 
 interface Orderbook {
+    market:string,
     bids: Bid[];
     asks: Ask[];
 }
 
-const orderbook: Orderbook = {
+
+const orderbooks: Orderbook[] = [
+    {
+
+            market:"Tata",
+          bids: [
+            
+          ],
+          asks: [
+            
+          ]
+
+    },{
+    market:"sol_usdc",
   bids: [
     
   ],
   asks: [
     
   ]
-}
+}]
 
 async function startServer() {
     try {
@@ -54,8 +68,7 @@ async function startServer() {
             
         }else{
          const message = JSON.parse(response.element)
-         console.log(message)
-          processingMessage(message.message,message.clientId,message.message.type)
+          processingMessage(message.message,message.clientId,message.message.type,message.market)
                 
             }
         }
@@ -63,8 +76,13 @@ async function startServer() {
         console.error("Failed to connect to Redis", error);
     }
 }
-function processingMessage(message:Ask|Bid,clientId: string,type:string){
-    console.log(message)
+function processingMessage(message:Ask|Bid,clientId: string,type:string,market:string){
+    const whichMarket=orderbooks.findIndex((e)=>{
+        console.log(e.market==market)
+    return e.market==market
+    })
+    const orderbook:Orderbook=orderbooks[whichMarket]
+    console.log(whichMarket)
     if(type=="DEPTH"){
             try{
                 engine_pubsub.publish(clientId,JSON.stringify(orderbook))

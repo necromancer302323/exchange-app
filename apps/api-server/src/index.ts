@@ -18,15 +18,14 @@ const engine_pubsub = createClient({
 function createRandomId() {
     return Math.random().toString()
 }
-function sendAndAwait(message: any) {
+function sendAndAwait(message: any,market:any) {
     return new Promise((resolve) => {
         const id = createRandomId();
-        console.log(id)
         engine_pubsub.subscribe(id, (message) => {
             engine_pubsub.unsubscribe(id);
             resolve(JSON.parse(message));
         });
-        publisher.lPush("order", JSON.stringify({ clientId: id, message }));
+        publisher.lPush("order", JSON.stringify({ clientId: id, message,market }));
     });
 }
 
@@ -35,15 +34,13 @@ const prisma = new PrismaClient()
 
 app.post("/api/v1/order", async (req, res) => {
     const request = req.body
-    console.log(req.body)
+    const {market}=req.query
     try {
         if(request.type=="bid"){
-        const response= await sendAndAwait(request)
-        console.log(response)
+        const response= await sendAndAwait(request,market)
         res.send(response)
         }else if(request.type == "ask"){
-            const response= await sendAndAwait(request)
-            console.log(response)
+            const response= await sendAndAwait(request,market)
             res.send(response)
         }else{
         res.status(200).send("err has occured");
@@ -54,8 +51,9 @@ app.post("/api/v1/order", async (req, res) => {
     }
 });
 app.get("/api/v1/depth", async (req, res) => {
-    const response= await sendAndAwait({ type: "DEPTH"})
-    console.log(response)
+    const {market}=req.query
+    console.log(market)
+    const response= await sendAndAwait({ type: "DEPTH"},market)
     res.send(response)
 })
 app.post("/signup", async (req, res) => {
@@ -64,7 +62,6 @@ app.post("/signup", async (req, res) => {
     if (!success) {
         res.status(400);
         res.send("invalid syntax")
-        console.log(req.body)
     } else {
         const user = await prisma.user.findFirst({
             where: {
