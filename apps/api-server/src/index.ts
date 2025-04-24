@@ -32,12 +32,13 @@ function sendAndAwait(message: any, market?: any) {
 app.post("/api/v1/order", async (req, res) => {
   const request = req.body;
   const { market } = req.query;
+  const userId=jwt.verify(req.header("Authorization")||"","112233")
   try {
     if (request.type == "bid") {
-      const response = await sendAndAwait(request, market);
+      const response = await sendAndAwait({type:request.type,price:request.price,quantity:request.quantity,userId}, market);
       res.send(response);
     } else if (request.type == "ask") {
-      const response = await sendAndAwait(request, market);
+      const response = await sendAndAwait({type:request.type,price:request.price,quantity:request.quantity,userId}, market);
       res.send(response);
     } else {
       res.status(200).send("err has occured");

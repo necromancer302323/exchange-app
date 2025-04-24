@@ -84,29 +84,50 @@ function processingMessage(
       engine_pubsub.publish(clientId, "error");
     }
   } else if (type == "bid") {
-    const orderId = Math.random().toString();
-    try {
+    for(let i=0;i<usersBalance.length;i++){
+      if(message.userId.id==usersBalance[i].userId){
+        if(message.price*message.quantity>usersBalance[i].balance-usersBalance[i].Locked){
+          engine_pubsub.publish(
+            clientId,
+            JSON.stringify({ message: "insufficient funds" })
+          );
+        }else{
+          usersBalance[i].Locked=message.price*message.quantity
+          const orderId = Math.random().toString();
+          try {
+            orderbook.bids.push({
+              price: message.price,
+              quantity: message.quantity,
+              orderId: orderId,
+              side: "bid",
+            });
+            engine_pubsub.publish(
+              clientId,
+              JSON.stringify({ message: "bid succesfull",orderId,usersBalance })
+            );
+            pubSub.publish("order", JSON.stringify(orderbook));
+          } catch (err) {
+            console.log(err);
+            engine_pubsub.publish(
+              clientId,
+              JSON.stringify({ message: "and error has occured order cancled" })
+            );
+          }
+        }
+      }
+  }
   
-      orderbook.bids.push({
-        price: message.price,
-        quantity: message.quantity,
-        orderId: orderId,
-        side: "bid",
-      });
-      engine_pubsub.publish(
-        clientId,
-        JSON.stringify({ message: "bid succesfull", orderId })
-      );
-      pubSub.publish("order", JSON.stringify(orderbook));
-    } catch (err) {
-      console.log(err);
-      engine_pubsub.publish(
-        clientId,
-        JSON.stringify({ message: "and error has occured order cancled" })
-      );
-    }
   } else if (type == "ask") {
-    const orderId = Math.random().toString();
+    for(let i=0;i<usersBalance.length;i++){
+      if(message.userId.id==usersBalance[i].userId){
+        if(message.price*message.quantity>usersBalance[i].balance-usersBalance[i].Locked){
+          engine_pubsub.publish(
+            clientId,
+            JSON.stringify({ message: "insufficient funds" })
+          );
+        }else{
+          usersBalance[i].Locked=message.price*message.quantity
+          const orderId = Math.random().toString();
     try {
       orderbook.asks.push({
         price: message.price,
@@ -126,6 +147,9 @@ function processingMessage(
         JSON.stringify({ message: "and error has occured order cancled" })
       );
     }
+        }
+      }}
+    
   }else if(type=="OnRamp"){
     console.log(message.userId)
     for(let i=0;i<usersBalance.length;i++){
