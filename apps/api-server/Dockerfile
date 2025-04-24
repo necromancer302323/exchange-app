@@ -9,7 +9,6 @@ RUN npm run build \
     --workspace=@repo/common \
     --workspace=api-server \
     --if-present
-    
 WORKDIR /src/apps/api-server
 EXPOSE 3000
 

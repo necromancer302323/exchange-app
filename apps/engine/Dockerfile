@@ -4,7 +4,7 @@ WORKDIR /
 COPY . .
 
 RUN npm i
-RUN npm install -g typescript
+RUN npm install typescript
 RUN npx tsc -b
 EXPOSE 3001
 
