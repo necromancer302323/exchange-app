@@ -75,7 +75,7 @@ app.post("/signup", async (req, res) => {
     });
     if (user) {
       res.send("user with this id already exists");
-    }
+    }else{
     try {
       await prisma.user.create({
         data: request,
@@ -96,6 +96,7 @@ app.post("/signup", async (req, res) => {
       res.send("an error has occured please try again");
     }
   }
+}
 });
 
 app.post("/signin", async (req, res) => {
