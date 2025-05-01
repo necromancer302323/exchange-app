@@ -1,8 +1,9 @@
 FROM node:latest
 
 WORKDIR /src
-COPY . .
+COPY package.json ./
 RUN  npm i
+COPY . .
 RUN npx prisma generate --schema=packages/db/prisma/schema.prisma
 RUN npm run build \
     --workspace=@repo/db \

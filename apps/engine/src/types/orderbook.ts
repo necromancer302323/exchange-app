@@ -2,6 +2,7 @@ interface Order {
     price: number;
     quantity: number;
     orderId: string;
+    userId:string
 }
 
 interface Bid extends Order {

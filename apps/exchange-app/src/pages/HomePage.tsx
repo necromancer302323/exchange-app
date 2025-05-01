@@ -77,11 +77,14 @@ export const Homepage = () => {
               <button
                 onClick={async () => {
                   await axios.post(
-                    `http://localhost:3000/api/v1/order?market=${searchParams.get("market")}`,
-                    {
+                    `http://localhost:3000/api/v1/order?market=${searchParams.get("market")}`, {
+                      headers:{
+                        Authorization: localStorage.getItem("token"),
+                      },
                       price: Number(price),
                       quantity: Number(quantity),
                       type: "ask",
+                     
                     }
                   );
                 }}
@@ -94,6 +97,9 @@ export const Homepage = () => {
                await axios.post(
                 `http://localhost:3000/api/v1/order?market=${searchParams.get("market")}`,
                     {
+                      headers:{
+                        Authorization: localStorage.getItem("token"),
+                      },
                       price: Number(price),
                       quantity: Number(quantity),
                       type: "bid",
