@@ -78,13 +78,13 @@ export const Homepage = () => {
                 onClick={async () => {
                   await axios.post(
                     `http://localhost:3000/api/v1/order?market=${searchParams.get("market")}`, {
-                      headers:{
-                        Authorization: localStorage.getItem("token"),
-                      },
                       price: Number(price),
                       quantity: Number(quantity),
                       type: "ask",
-                     
+                    },{
+                      headers:{
+                        Authorization: localStorage.getItem("token"),
+                      },
                     }
                   );
                 }}
