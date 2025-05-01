@@ -101,6 +101,7 @@ function processingMessage(
       if(inrBalance[i].userId!=message.userId.id){
         
       }else{
+        
       if(message.price*message.quantity>inrBalance[i].balance-inrBalance[i].Locked){
         engine_pubsub.publish(
           clientId,
@@ -119,8 +120,8 @@ function processingMessage(
                 inrBalance[inrBalance.findIndex((e)=>{return e.userId==orderbook.asks[i].userId})].balance+=message.price*message.quantity
                 stockBalance[stockBalance.findIndex((e)=>{return e.userId==message.userId.id})].balance[market||"sol_usdc"]+=message.quantity
                 stockBalance[stockBalance.findIndex((e)=>{return e.userId==orderbook.asks[i].userId})].balance[market||"sol_usdc"]-=message.quantity
-                inrBalance[inrBalance.findIndex((e)=>{return e.userId==message.userId.id})].Locked=0
-                stockBalance[stockBalance.findIndex((e)=>{return e.userId==orderbook.asks[i].userId})].Locked=0
+                inrBalance[inrBalance.findIndex((e)=>{return e.userId==message.userId.id})].Locked-=message.price*message.quantity
+                stockBalance[stockBalance.findIndex((e)=>{return e.userId==orderbook.asks[i].userId})].Locked-=message.quantity
                 orderbook.asks.splice(i, 1);
                 pubSub.publish("order", JSON.stringify(orderbook));
                 engine_pubsub.publish(
@@ -133,8 +134,8 @@ function processingMessage(
                 stockBalance[stockBalance.findIndex((e)=>{return e.userId==message.userId.id})].balance[market||"sol_usdc"]+=message.quantity
                 stockBalance[stockBalance.findIndex((e)=>{return e.userId==orderbook.asks[i].userId})].balance[market||"sol_usdc"]-=message.quantity
                 orderbook.asks[i].quantity-=message.quantity
-                inrBalance[inrBalance.findIndex((e)=>{return e.userId==message.userId.id})].Locked=0
-                stockBalance[stockBalance.findIndex((e)=>{return e.userId==orderbook.asks[i].userId})].Locked-=message.quantity*message.price
+                inrBalance[inrBalance.findIndex((e)=>{return e.userId==message.userId.id})].Locked-=message.price*message.quantity
+                stockBalance[stockBalance.findIndex((e)=>{return e.userId==orderbook.asks[i].userId})].Locked-=message.quantity
                 pubSub.publish("order", JSON.stringify(orderbook));
                 engine_pubsub.publish(
                   clientId,
@@ -146,8 +147,8 @@ function processingMessage(
                 inrBalance[inrBalance.findIndex((e)=>{return e.userId==orderbook.asks[i].userId})].balance+=message.price*orderbook.asks[i].quantity
                 stockBalance[stockBalance.findIndex((e)=>{return e.userId==message.userId.id})].balance[market||"sol_usdc"]+=orderbook.asks[i].quantity
                 stockBalance[stockBalance.findIndex((e)=>{return e.userId==orderbook.asks[i].userId})].balance[market||"sol_usdc"]-=orderbook.asks[i].quantity
-                stockBalance[stockBalance.findIndex((e)=>{return e.userId==orderbook.asks[i].userId})].Locked=0
-                inrBalance[inrBalance.findIndex((e)=>{return e.userId==message.userId.id})].Locked=message.price*message.quantity-orderbook.asks[i].quantity
+                stockBalance[stockBalance.findIndex((e)=>{return e.userId==orderbook.asks[i].userId})].Locked-=orderbook.asks[i].quantity
+                inrBalance[inrBalance.findIndex((e)=>{return e.userId==message.userId.id})].Locked+=message.price*(message.quantity-orderbook.asks[i].quantity)
                 orderbook.bids.push({
                   price: message.price,
                   quantity: message.quantity-orderbook.asks[i].quantity,
@@ -173,7 +174,7 @@ function processingMessage(
               side: "bid",
               userId:message.userId.id
             });
-            inrBalance[i].Locked=message.quantity-orderbook.asks[i].quantity
+            inrBalance[i].Locked+=message.price*message.quantity
             engine_pubsub.publish(
               clientId,
               JSON.stringify({
@@ -233,8 +234,8 @@ function processingMessage(
                   stockBalance[stockBalance.findIndex((e)=>{return e.userId==orderbook.bids[i].userId})].balance[market||"sol_usdc"]+=message.quantity
                   stockBalance[stockBalance.findIndex((e)=>{return e.userId==message.userId.id})].balance[market||"sol_usdc"]-=message.quantity
                   orderbook.bids[i].quantity-=message.quantity
-                  stockBalance[stockBalance.findIndex((e)=>{return e.userId==message.userId.id})].Locked=0
-                  inrBalance[inrBalance.findIndex((e)=>{return e.userId==orderbook.bids[i].userId})].Locked=message.quantity*message.price
+                  stockBalance[stockBalance.findIndex((e)=>{return e.userId==message.userId.id})].Locked-=message.quantity
+                  inrBalance[inrBalance.findIndex((e)=>{return e.userId==orderbook.bids[i].userId})].Locked+=message.quantity*message.price
                   pubSub.publish("order", JSON.stringify(orderbook));
                   engine_pubsub.publish(
                     clientId,
@@ -246,8 +247,8 @@ function processingMessage(
                   inrBalance[inrBalance.findIndex((e)=>{return e.userId==orderbook.bids[i].userId})].balance-=message.price*orderbook.bids[i].quantity
                   stockBalance[stockBalance.findIndex((e)=>{return e.userId==orderbook.bids[i].userId})].balance[market||"sol_usdc"]+=orderbook.bids[i].quantity
                   stockBalance[stockBalance.findIndex((e)=>{return e.userId==message.userId.id})].balance[market||"sol_usdc"]-=orderbook.bids[i].quantity
-                  stockBalance[stockBalance.findIndex((e)=>{return e.userId==message.userId.id})].Locked=message.quantity*message.price-orderbook.bids[i].quantity
-                  inrBalance[inrBalance.findIndex((e)=>{return e.userId==orderbook.bids[i].userId})].Locked=0
+                  stockBalance[stockBalance.findIndex((e)=>{return e.userId==message.userId.id})].Locked+=message.price*(message.quantity-orderbook.bids[i].quantity)
+                  inrBalance[inrBalance.findIndex((e)=>{return e.userId==orderbook.bids[i].userId})].Locked-=message.quantity*message.price
                   orderbook.asks.push({
                     price: message.price,
                     quantity: message.quantity-orderbook.bids[i].quantity,
@@ -255,7 +256,7 @@ function processingMessage(
                     side: "ask",
                     userId:message.userId.id
                   });
-                 stockBalance[i].Locked=message.quantity-orderbook.bids[i].quantity
+                 stockBalance[i].Locked+=message.quantity-orderbook.bids[i].quantity
                   orderbook.bids.splice(i, 1);
                   engine_pubsub.publish(
                     clientId,
@@ -273,7 +274,7 @@ function processingMessage(
                 side: "ask",
                 userId:message.userId.id
               });
-              stockBalance[i].Locked=message.quantity-orderbook.bids[i].quantity
+              stockBalance[i].Locked+=message.quantity
               pubSub.publish("order", JSON.stringify(orderbook));
               engine_pubsub.publish(
                 clientId,
