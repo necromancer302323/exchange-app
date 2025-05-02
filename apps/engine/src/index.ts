@@ -83,13 +83,10 @@ function processingMessage(
   type: string,
   market?: "sol_usdc" | "tata"
 ) {
-  console.log(type);
   const whichMarket = orderbooks.findIndex((e) => {
-    console.log(e.market == market);
     return e.market == market;
   });
   const orderbook: Orderbook = orderbooks[whichMarket == -1 ? 0 : whichMarket];
-  console.log(whichMarket);
   if(type=="DEPTH"){
       try {
         engine_pubsub.publish(clientId, JSON.stringify(orderbook));
@@ -116,7 +113,6 @@ function processingMessage(
         pubSub.publish("order", JSON.stringify(orderbook));
     }
       else if(type=="OnRamp"){
-      console.log(message.userId);
       for (let i = 0; i < inrBalance.length; i++) {
         if (message.userId.id == inrBalance[i].userId && Number(message.amount) > 0) {
           inrBalance[i].balance += Number(message.amount);
@@ -129,7 +125,6 @@ function processingMessage(
       }
     }
       else if(type=="OnRamp-Stocks"){
-      console.log(message.userId);
       for (let i = 0; i < stockBalance.length; i++) {
         if (
           message.userId.id == stockBalance[i].userId &&
@@ -156,7 +151,6 @@ function processingMessage(
       );
     }
       else if(type=="addUser"){
-      console.log(typeof message.userId.id);
       inrBalance.push({
         userId: message.userId.id,
         balance: 0,
