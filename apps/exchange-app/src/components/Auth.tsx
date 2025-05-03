@@ -4,19 +4,29 @@ import { Link, useNavigate } from "react-router-dom";
 import {SignupInput} from "@repo/common"
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
+  const navigate=useNavigate()
   const [postInput, setPostInputs] = useState<SignupInput>({
     email: "",
     password: "",
   });
   async function sendRequest() {
     try {
-      const res = await axios.post(
+      const res:any = await axios.post(
         `http://localhost:3000/${type == "signup" ? "signup" : "signin"}`,
         postInput
       );
+      console.log(res.data.message!="user with this id already exists"&&res.data.message!="check if you credentials are right")
+      if(res.data.message!="check if you credentials are right"&&res.data.message!="user with this id already exists"){
       const jwt:any = res.data;
       localStorage.setItem("token", jwt);
       console.log(jwt)
+      {
+        type == "signup" ? navigate("/signin") : navigate("/?market=sol_usdc");
+      }
+      alert(res.data.message)
+      }else{
+        alert(res.data.message)
+      }
     } catch (e) {
       alert("an error has happend");
     }

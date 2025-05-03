@@ -12,7 +12,6 @@ export const Homepage = () => {
   const data = useGetDepth(searchParams.get("market") || "");
   const socket = new WebSocket("ws://localhost:8080");
   socket.onmessage = function (message) {
-    console.log(message.data);
     setOrderBook(JSON.parse(message.data));
   };
   useEffect(() => {
@@ -76,7 +75,7 @@ export const Homepage = () => {
             <div className="grid grid-cols-2 gap-1">
               <button
                 onClick={async () => {
-                  await axios.post(
+                const response:any=  await axios.post(
                     `http://localhost:3000/api/v1/order?market=${searchParams.get("market")}`, {
                       price: Number(price),
                       quantity: Number(quantity),
@@ -87,6 +86,8 @@ export const Homepage = () => {
                       },
                     }
                   );
+                  console.log(response.message)
+                  alert(response.message)
                 }}
                 className="bg-slate-800 text-red-700  justify-center rounded-lg h-11"
               >
@@ -94,17 +95,19 @@ export const Homepage = () => {
               </button>
               <button
                 onClick={async () => {
-               await axios.post(
+                  const response:any=  await axios.post(
                 `http://localhost:3000/api/v1/order?market=${searchParams.get("market")}`,
                     {
-                      headers:{
-                        Authorization: localStorage.getItem("token"),
-                      },
                       price: Number(price),
                       quantity: Number(quantity),
                       type: "bid",
+                    },{
+                      headers:{
+                        Authorization: localStorage.getItem("token"),
+                      },
                     }
                   );
+                  alert(response.message)
                 }}
                 className="bg-slate-700 text-green-700 justify-center rounded-lg h-11"
               >

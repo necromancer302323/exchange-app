@@ -74,7 +74,7 @@ app.post("/signup", async (req, res) => {
       },
     });
     if (user) {
-      res.send("user with this id already exists");
+      res.send({message:"user with this id already exists"});
     }else{
     try {
       await prisma.user.create({
@@ -121,7 +121,7 @@ app.post("/signin", async (req, res) => {
         const token = jwt.sign(JSON.stringify(userId), "112233");
         res.send(token);
       } else {
-        res.send("check if you credentials are right");
+        res.send({message:"check if you credentials are right"});
       }
     } catch (err) {
       console.log(err);
