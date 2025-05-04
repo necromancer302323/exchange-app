@@ -55,10 +55,16 @@ export function createbid(inrBalance: userBalances[], stockBalance: stockBalance
                 orderbook.asks.splice(j, 1);
                 continue;
               }
+            }else{
+              j++
             }
           }
           if (executedQty!=0) {
-            orderbook.bids.push({
+            let index=0
+            while(index<orderbook.bids.length&&orderbook.bids[index].price<message.price){
+              index++
+            }
+            orderbook.bids.splice(index,0,{
               price: message.price,
               quantity: message.quantity - executedQty,
               orderId: orderId,
@@ -69,7 +75,11 @@ export function createbid(inrBalance: userBalances[], stockBalance: stockBalance
             return { message: "ask added succesfull some executed", orderId, executedQty }
           }
           if (!foundAMatch) {
-            orderbook.bids.push({
+            let index=0
+            while(index<orderbook.bids.length&&orderbook.bids[index].price<message.price){
+              index++
+            }
+            orderbook.bids.splice(index,0,{
               price: message.price,
               quantity: message.quantity,
               orderId: orderId,
@@ -82,8 +92,7 @@ export function createbid(inrBalance: userBalances[], stockBalance: stockBalance
               orderId,
               executedQty
             }
-          } else {
-          }
+          } 
         } catch (err) {
           console.log(err);
           return { message: "and error has occured order cancled" }
@@ -152,20 +161,16 @@ export function createAsk(inrBalance: userBalances[], stockBalance: stockBalance
                   stockBalance[user_stock].Locked += message.quantity - orderbook.bids[j].quantity
                 orderbook.bids.splice(j, 1);
               }
+            }else{
+              j++
             }
           }
-          if (executedQty != 0) {
-            orderbook.asks.push({
-              price: message.price,
-              quantity: message.quantity - executedQty,
-              orderId: orderId,
-              side: "ask",
-              userId: message.userId.id
-            });
-            return { message: "ask added succesfull some executed", orderId, executedQty }
-          }
           if (!foundAMatch) {
-            orderbook.asks.push({
+            let index=0
+            while(index<orderbook.asks.length&&orderbook.asks[index].price<message.price){
+              index++
+            }
+            orderbook.asks.splice(index,0,{
               price: message.price,
               quantity: message.quantity,
               orderId: orderId,
@@ -174,8 +179,23 @@ export function createAsk(inrBalance: userBalances[], stockBalance: stockBalance
             });
             stockBalance[stockBalance.findIndex((e) => { return e.userId == message.userId.id })].Locked += message.quantity
             return { message: "ask added succesfull", orderId }
-          } else {
           }
+          if (executedQty != 0) {
+            let index=0
+            while(index<orderbook.asks.length&&orderbook.asks[index].price<message.price){
+              index++
+            }
+            orderbook.asks.splice(index,0,{
+              price: message.price,
+              quantity: message.quantity -executedQty,
+              orderId: orderId,
+              side: "ask",
+              userId: message.userId.id
+            });
+            return { message: "ask added succesfull some executed", orderId, executedQty }
+          }
+          
+       
         } catch (err) {
           console.log(err)
           return { message: "an error has occured" }

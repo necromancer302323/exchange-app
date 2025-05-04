@@ -31,7 +31,7 @@ export const Homepage = () => {
                 </tr>
               </thead>
               <tbody>
-                {orderBook?.asks.slice(0, 5).map((value: any, index: any) => {
+                {orderBook?.asks.slice().reverse().slice(0, 5).map((value: any, index: any) => {
                   return (
                     <tr key={index} className=" text-red-400 text-center ">
                       <td>{value.price}</td>
@@ -44,7 +44,7 @@ export const Homepage = () => {
                     248.26
                   </td>
                 </tr>
-                {orderBook?.bids.slice(0, 5).map((value: any, index: any) => {
+                {orderBook?.bids.slice().reverse().slice(0, 5).map((value: any, index: any) => {
                   return (
                     <tr key={index} className=" text-green-400 text-center">
                       <td>{value.price}</td>
