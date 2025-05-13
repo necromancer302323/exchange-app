@@ -9,6 +9,6 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "module": "CommonJS",
+    "module": "CommonJS"
   }
 }

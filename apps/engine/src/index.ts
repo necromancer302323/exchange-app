@@ -1,7 +1,8 @@
 import { createClient } from "redis";
 import { Orderbook } from "./types/orderbook";
 import { stockBalances, userBalances } from "./types/Balances";
-import { createAsk, createbid } from "./functions/createOrders";
+import { createbid } from "./functions/createBid";
+import { createAsk } from "./functions/createAsks";
 
 const client = createClient({
   url: "redis://my-redis:6379",
@@ -87,7 +88,7 @@ function processingMessage(
     return e.market == market;
   });
   const orderbook: Orderbook = orderbooks[whichMarket == -1 ? 0 : whichMarket];
-  if(type=="DEPTH"){
+  if(type=="DEPTH"){  
       try {
         engine_pubsub.publish(clientId, JSON.stringify(orderbook));
       } catch (e) {
@@ -105,7 +106,8 @@ function processingMessage(
       }
     }
       else if(type=="ask"){
-        const response=  createAsk(inrBalance,stockBalance,message,market,orderbook)
+        const response= createAsk(inrBalance,stockBalance,message,market,orderbook)
+        console.log(response)
         engine_pubsub.publish(
           clientId,
           JSON.stringify(response)
@@ -123,6 +125,10 @@ function processingMessage(
           break;
         }
       }
+      engine_pubsub.publish(
+            clientId,
+            JSON.stringify({ message: "user not found ", inrBalance })
+          );
     }
       else if(type=="OnRamp-Stocks"){
       for (let i = 0; i < stockBalance.length; i++) {

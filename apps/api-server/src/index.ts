@@ -7,7 +7,10 @@ import { signinInput, signupInput } from "@repo/common";
 const app = express();
 app.use(express.json());
 app.use(cors());
-
+app.use("/api/v1",(req:any,res,next)=>{
+  req.userId=jwt.verify(req.header("Authorization")||"","112233")
+  next()
+})
 const publisher = createClient({
   url: "redis://my-redis:6379",
 });
@@ -18,6 +21,7 @@ const engine_pubsub = createClient({
 function createRandomId() {
   return Math.random().toString();
 }
+
 function sendAndAwait(message: any, market?: any) {
   return new Promise((resolve) => {
     const id = createRandomId();
@@ -29,16 +33,16 @@ function sendAndAwait(message: any, market?: any) {
   });
 }
 
-app.post("/api/v1/order", async (req, res) => {
+app.post("/api/v1/order", async (req:any, res) => {
   const request = req.body;
   const { market } = req.query;
-  const userId=jwt.verify(req.header("Authorization")||"","112233")
+  const userId=req.userId
   try {
     if (request.type == "bid") {
-      const response = await sendAndAwait({type:request.type,price:request.price,quantity:request.quantity,userId}, market);
+      const response = await sendAndAwait({type:request.type,orderType:request.orderType,price:request.price,quantity:request.quantity,userId}, market);
       res.send(response);
     } else if (request.type == "ask") {
-      const response = await sendAndAwait({type:request.type,price:request.price,quantity:request.quantity,userId}, market);
+      const response = await sendAndAwait({type:request.type,orderType:request.orderType,price:request.price,quantity:request.quantity,userId}, market);
       res.send(response);
     } else {
       res.status(200).send("err has occured");
@@ -48,7 +52,8 @@ app.post("/api/v1/order", async (req, res) => {
     res.status(500).send("Failed to store submission.");
   }
 });
-app.get("/api/v1/depth", async (req, res) => {
+
+app.get("/depth", async (req, res) => {
   const { market } = req.query;
   console.log(market);
   const response = await sendAndAwait({ type: "DEPTH" }, market);
