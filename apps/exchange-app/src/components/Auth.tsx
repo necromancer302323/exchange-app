@@ -15,11 +15,9 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
         `http://localhost:3000/${type == "signup" ? "signup" : "signin"}`,
         postInput
       );
-      console.log(res.data.message!="user with this id already exists"&&res.data.message!="check if you credentials are right")
       if(res.data.message!="check if you credentials are right"&&res.data.message!="user with this id already exists"){
       const jwt:any = res.data;
       localStorage.setItem("token", jwt);
-      console.log(jwt)
       {
         type == "signup" ? navigate("/signin") : navigate("/?market=sol_usdc");
       }

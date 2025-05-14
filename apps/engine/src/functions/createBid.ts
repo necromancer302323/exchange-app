@@ -155,7 +155,7 @@ export function createbid(inrBalance: userBalances[], stockBalance: stockBalance
                   for(let k=0;k<=j;k++){
                     const seller_inr = inrBalance.findIndex((e) => { return e.userId == orderbook.asks[0].userId })
               const seller_stock = stockBalance.findIndex((e) => { return e.userId == orderbook.asks[0].userId })
-              if(k!=j){
+              if(k!=j||j==0){
                   inrBalance[user_inr].balance -= orderbook.asks[k].price *orderbook.asks[0].quantity 
                 inrBalance[seller_inr].balance += orderbook.asks[k].price *orderbook.asks[0].quantity
                 stockBalance[user_stock].balance[market || "sol_usdc"] += orderbook.asks[0].quantity
@@ -166,7 +166,6 @@ export function createbid(inrBalance: userBalances[], stockBalance: stockBalance
                 orderbook.asks.splice(0,1)
                 continue;
               }else{
-                console.log(total_quantity-message.quantity)
                   inrBalance[user_inr].balance -= orderbook.asks[0].price *(total_quantity-message.quantity) 
                 inrBalance[seller_inr].balance += orderbook.asks[0].price *(total_quantity-message.quantity )
                 stockBalance[user_stock].balance[market || "sol_usdc"] += total_quantity-message.quantity 

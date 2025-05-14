@@ -7,7 +7,7 @@ import { signinInput, signupInput } from "@repo/common";
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use("/api/v1",(req:any,res,next)=>{
+app.use("/api/v1",(req:any,_,next)=>{
   req.userId=jwt.verify(req.header("Authorization")||"","112233")
   next()
 })
@@ -59,11 +59,16 @@ app.get("/depth", async (req, res) => {
   const response = await sendAndAwait({ type: "DEPTH" }, market);
   res.send(response);
 });
-app.post("/onRamp", async (req, res) => {
+app.post("/api/v1/onRamp", async (req:any, res) => {
     const request=req.body
-   const userId=jwt.verify(req.header("Authorization")||"","112233")
+  const userId=req.userId
    const response = await sendAndAwait({ type: "OnRamp",userId,amount:request.amount });
 res.send(response)
+})
+app.post("/api/v1/getUsersBalance",async (req:any,res)=>{
+  const userId=req.userId
+   const response = await sendAndAwait({ type: "UsersBalance",userId });
+   res.send(response)
 })
 app.post("/signup", async (req, res) => {
   const request = req.body;

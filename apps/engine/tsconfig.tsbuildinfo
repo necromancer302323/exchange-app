@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/functions/createasks.ts","./src/functions/createbid.ts","./src/types/balances.ts","./src/types/orderbook.ts"],"errors":true,"version":"5.8.2"}
+{"root":["./src/index.ts","./src/functions/createasks.ts","./src/functions/createbid.ts","./src/types/balances.ts","./src/types/orderbook.ts"],"version":"5.8.2"}

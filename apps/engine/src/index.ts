@@ -130,32 +130,6 @@ function processingMessage(
             JSON.stringify({ message: "user not found ", inrBalance })
           );
     }
-      else if(type=="OnRamp-Stocks"){
-      for (let i = 0; i < stockBalance.length; i++) {
-        if (
-          message.userId.id == stockBalance[i].userId &&
-          Number(message.amount) > 0
-        ) {
-          if (!market) {
-            engine_pubsub.publish(
-              clientId,
-              JSON.stringify({ message: "market not found " })
-            );
-          } else {
-            stockBalance[i].balance[market] += Number(message.amount);
-            engine_pubsub.publish(
-              clientId,
-              JSON.stringify({ message: "added balance ", stockBalance })
-            );
-            break;
-          }
-        }
-      }
-      engine_pubsub.publish(
-        clientId,
-        JSON.stringify({ message: "added balance ", inrBalance })
-      );
-    }
       else if(type=="addUser"){
       inrBalance.push({
         userId: message.userId.id,
@@ -171,6 +145,20 @@ function processingMessage(
         Locked: 0,
       });
       engine_pubsub.publish(clientId, JSON.stringify({ message: "user added",inrBalance }));
+  }else if(type=="UsersBalance"){
+    for (let i=0;i<inrBalance.length;i++){
+      if(inrBalance[i].userId==message.userId.id){
+        const userINRBalance=inrBalance[i] 
+         for (let j=0;j<stockBalance.length;j++){
+         if(stockBalance[j].userId==message.userId.id){
+          const userStockBalance=stockBalance[j]
+             engine_pubsub.publish(clientId, JSON.stringify({ message: "user balance",userStockBalance,userINRBalance}));
+             break
+         }
+        }
+      }
+    }
+           engine_pubsub.publish(clientId, JSON.stringify({ message: "user balance not found"}));
   }
 }
 startServer();
