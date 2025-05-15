@@ -11,7 +11,7 @@ return  <div>
                 <tr>
                 <td className="text-white 2xl">INR BALANCE</td>
                 </tr>
-                      <tr key={Math.random()} className=" text-red-400 text-center ">
+                      <tr key={Math.random()} className="text-slate-400 text-center ">
                         <td>{inrBalance.balance}</td>
                         <td>{inrBalance.Locked}</td>
                       </tr>
@@ -20,7 +20,7 @@ return  <div>
                 <tr>
                         <td className="text-white 2xl">STOCK BALANCE</td>
                         </tr>
-                      <tr key={Math.random()} className=" text-green-400 text-center">
+                      <tr key={Math.random()} className=" text-slate-400 text-center">
                         <td>{stockBalance.balance[market||"sol_usdc"]}</td>
                         <td>{stockBalance.Locked}</td>
                       </tr>
